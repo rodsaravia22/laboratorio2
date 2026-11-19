@@ -27,28 +27,44 @@ En Windows: `py -3 -m unittest discover -v`.
 
 Las pruebas de `operaciones.py` muestran ejemplos sencillos de cada cálculo y verifican los errores esperados. Las de `historial.py` verifican el orden, el límite y el borrado. `listar` devuelve una copia para que un consumidor pueda modificar el resultado sin alterar la lista original.
 
-## Gitflow
+## Flujo de trabajo Gitflow
 
-Usa una rama por módulo y fusiona las funcionalidades terminadas en `develop`; publica una versión mediante una rama `release` y una fusión final a `main`.
+La rama estable es `main`; el trabajo de integración se realiza en `develop`. Cada integrante debe actualizar `develop`, crear su propia rama y abrir un pull request hacia `develop`. No se integra trabajo directamente en `main`.
 
 ```bash
-git flow init
-git checkout develop
-git flow feature start operaciones
-git add operaciones.py test_operaciones.py
-git commit -m "feat: implementar operaciones matemáticas"
-git flow feature finish operaciones
+git clone git@github.com:rodsaravia22/laboratorio2.git
+cd laboratorio2
+git switch develop
+git pull --ff-only origin develop
+git switch -c feature/operaciones  # o feature/historial, feature/interfaz
+```
 
-git flow feature start historial
-git add historial.py test_historial.py
-git commit -m "feat: implementar historial de cálculos"
-git flow feature finish historial
+Después de hacer cambios y revisarlos:
 
-git flow feature start interfaz
-git add main.py interfaz.py demo_interfaz.py README.md
-git commit -m "feat: añadir interfaz gráfica"
-git flow feature finish interfaz
+```bash
+git status
+git add operaciones.py test_operaciones.py  # sustituye por los archivos de tu módulo
+git diff --staged
+git commit -m "Implementar y probar operaciones"
+git push -u origin feature/operaciones
+```
 
-git flow release start 1.0.0
-git flow release finish 1.0.0
+Abre un pull request de `feature/operaciones` hacia `develop`. El equipo revisa los cambios y ejecuta `python -m unittest discover -v` y `python main.py` tras integrarlos.
+
+Cuando el equipo apruebe la integración, prepara la publicación:
+
+```bash
+git switch develop
+git pull --ff-only origin develop
+git switch -c release/1.0.0
+python -m unittest discover -v
+```
+
+Abre un pull request de `release/1.0.0` a `main` y otro de `release/1.0.0` a `develop`. Después de su revisión e integración, etiqueta la versión:
+
+```bash
+git switch main
+git pull --ff-only origin main
+git tag -a v1.0.0 -m "Calculadora grafica 1.0.0"
+git push origin v1.0.0
 ```
